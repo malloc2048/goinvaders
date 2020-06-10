@@ -26,6 +26,14 @@
   version = "v1.6.1"
 
 [[projects]]
+  digest = "1:e3cbaea9e65ee82695ee48811266dcaf12a476e62624817a64895df8b04f6857"
+  name = "github.com/veandco/go-sdl2"
+  packages = ["sdl"]
+  pruneopts = "UT"
+  revision = "efac84439a5dabf62db5c86d3cbcbbc9ac62c322"
+  version = "v0.4.4"
+
+[[projects]]
   branch = "v3"
   digest = "1:8639671727a344ac01338e004e63774356483aba4a7ad2881f5a8f0ff4affe29"
   name = "gopkg.in/yaml.v3"
@@ -36,6 +44,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/stretchr/testify/assert"]
+  input-imports = [
+    "github.com/stretchr/testify/assert",
+    "github.com/veandco/go-sdl2/sdl",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

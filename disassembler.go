@@ -2,18 +2,18 @@ package main
 
 import (
 	"fmt"
+	"goinvaders/machine"
 	"goinvaders/machine/cpu/i8080"
+	"goinvaders/machine/cpu/i8080/instructions"
 	"goinvaders/machine/memory"
 	"os"
 )
 
 func main() {
-	//var line string
-	//var disassembly []string
 	mem := new(memory.Memory)
-	mem.LoadRom("roms/invaders")
+	mem.LoadRom(machine.RomFilename)
 
-	disassemblyFile, err := os.Create("roms/invaders.dis")
+	disassemblyFile, err := os.Create(machine.DisassemblyFilename)
 	if err != nil {
 		panic(err)
 	}
@@ -21,15 +21,15 @@ func main() {
 
 	for idx := uint16(0); idx < memory.ROM_SIZE; idx += 0 {
 		opcode := mem.ReadByte(idx)
-		line := fmt.Sprintf("%04x\t%02x\t%s", idx, opcode, i8080.DISASSEMBLE_TABLE[opcode])
+		line := fmt.Sprintf("%04x\t%02x\t%s", idx, opcode, i8080.DisassembleTable[opcode])
 
-		if i8080.OPCODES_LENGTH[opcode] == 2 {
+		if instructions.OpcodesLength[opcode] == 2 {
 			line = fmt.Sprintf("%s%02x", line, mem.ReadByte(idx+1))
-		} else if i8080.OPCODES_LENGTH[opcode] == 3 {
+		} else if instructions.OpcodesLength[opcode] == 3 {
 			line = fmt.Sprintf("%s%02x", line, mem.ReadWord(idx+1))
 		}
 
 		_, _ = disassemblyFile.WriteString(fmt.Sprintf("%s\n", line))
-		idx += uint16(i8080.OPCODES_LENGTH[opcode])
+		idx += uint16(instructions.OpcodesLength[opcode])
 	}
 }
