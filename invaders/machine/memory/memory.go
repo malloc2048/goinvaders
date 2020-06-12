@@ -21,7 +21,7 @@ func (mem *Memory) LoadRom(romFile string) {
 	copy(mem.Storage[:], data[:])
 }
 
-func (mem *Memory) ReadByte(address uint16) byte {
+func (mem *Memory) Read(address uint16) byte {
 	return mem.Storage[address]
 }
 
