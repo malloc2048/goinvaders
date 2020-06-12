@@ -2,7 +2,8 @@ package invaders
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
-	"goinvaders/machine"
+	"goinvaders/invaders/machine"
+	"log"
 )
 
 func NewInvaders(cabinet *machine.Cabinet) *Invaders {
@@ -28,6 +29,21 @@ type Invaders struct {
 	window   *sdl.Window
 	texture  *sdl.Texture
 	renderer *sdl.Renderer
+}
+
+func (invaders *Invaders) Draw() {
+	_ = invaders.renderer.SetDrawColor(0, 0, 255, 255)
+
+	if err := invaders.renderer.Clear(); err != nil {
+		sdl.Log("invaders.renderer.Clear: %s", sdl.GetError())
+		log.Printf("invaders.renderer.Clear: %s", err.Error())
+	}
+
+	if err := invaders.renderer.Copy(invaders.texture, nil, nil); err != nil {
+		sdl.Log("invaders.renderer.Copy: %s", sdl.GetError())
+		log.Printf("invaders.renderer.Copy: %s", err.Error())
+	}
+	invaders.renderer.Present()
 }
 
 func (invaders *Invaders) PollEvents() {
@@ -71,8 +87,9 @@ func (invaders *Invaders) Update() {
 
 		// grab the next opcode for later to handle space invader special codes
 		// if hte opcode is one of the special codes the cpu will treat as a NOP
-		opcode := invaders.cabinet.Memory.ReadByte(invaders.cabinet.CPU.Regs.PC)
-		invaders.cabinet.CPU.Step()
+		//opcode := invaders.cabinet.Memory.Read(invaders.cabinet.CPU.Regs.PC)
+
+		opcode := invaders.cabinet.CPU.Step()
 		cycleCount += invaders.cabinet.CPU.CycleCount - startCycle
 
 		// Handle game specific instructions
@@ -97,10 +114,14 @@ func (invaders *Invaders) Update() {
 
 func (invaders *Invaders) GpuUpdate() {
 	// one byte of VRAM contains data for 8 pixels
+	//for i := uint16(0); i < machine.ScreenWidth*machine.ScreenHeight/8; i++ {
+	//	log.Printf("VRAM memory %02x", invaders.cabinet.Memory.Read(machine.VramAddress + i))
+	//}
+
 	for i := uint16(0); i < machine.ScreenWidth*machine.ScreenHeight/8; i++ {
 		y := i * 8 / machine.ScreenHeight
 		baseX := (i * 8) % machine.ScreenHeight
-		currentByte := invaders.cabinet.Memory.ReadByte(machine.VramAddress + i)
+		currentByte := invaders.cabinet.Memory.Read(machine.VramAddress + i)
 
 		for bit := uint16(0); bit < 8; bit++ {
 			py := y
@@ -111,12 +132,10 @@ func (invaders *Invaders) GpuUpdate() {
 			green := byte(0)
 			blue := byte(0)
 			if isLit {
-				red = 0
-				green = 222
-				blue = 0
+				red = 255
 			}
 
-			// screen is rotated 90 degrees counter clockwise so compensate the pixels
+			//screen is rotated 90 degrees counter clockwise so compensate the pixels
 			tempX := px
 			px = py
 			py = -tempX + machine.ScreenHeight - 1
@@ -124,17 +143,22 @@ func (invaders *Invaders) GpuUpdate() {
 			invaders.cabinet.ScreenBuffer[py][px][0] = red
 			invaders.cabinet.ScreenBuffer[py][px][1] = green
 			invaders.cabinet.ScreenBuffer[py][px][2] = blue
+			invaders.cabinet.ScreenBuffer[py][px][3] = 255
 		}
 	}
 	invaders.updateScreen()
 }
 
 func (invaders *Invaders) updateScreen() {
+	//format, access, width, height, err := invaders.texture.Query()
+	//sdl.Log("format %d, access %d, width %d, height %d, err %s", format, access, width, height, err)
+
 	pitch := 4 * machine.ScreenWidth
 	var data []byte
 
 	for i := 0; i < machine.ScreenHeight; i++ {
 		for j := 0; j < machine.ScreenWidth; j++ {
+			//data = append(data, 0, 20, 255, 0)
 			data = append(data, invaders.cabinet.ScreenBuffer[i][j][0])
 			data = append(data, invaders.cabinet.ScreenBuffer[i][j][1])
 			data = append(data, invaders.cabinet.ScreenBuffer[i][j][2])
@@ -190,7 +214,10 @@ func (invaders *Invaders) windowInit() bool {
 		sdl.Log("unable to create render: %s", sdl.GetError())
 		return false
 	}
-	//invaders.renderer.RenderSetLogicalSize(machine.ScreenWidth, machine.ScreenHeight)
+	_ = invaders.renderer.SetLogicalSize(machine.ScreenWidth, machine.ScreenHeight)
+
+	rendererInfo, _ := invaders.renderer.GetInfo()
+	sdl.Log("using renderer: %s", rendererInfo.Name)
 
 	// create a texture to display
 	if invaders.texture, err = invaders.renderer.CreateTexture(

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/veandco/go-sdl2/sdl"
 	"goinvaders/invaders"
-	"goinvaders/machine"
+	"goinvaders/invaders/machine"
 )
 
 func main() {
@@ -18,5 +18,6 @@ func main() {
 			game.Update()
 			game.GpuUpdate()
 		}
+		game.Draw()
 	}
 }
