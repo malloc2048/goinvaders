@@ -7,9 +7,24 @@ import (
 	"goinvaders/invaders/machine/cpu/i8080/instructions"
 	"goinvaders/invaders/machine/memory"
 	"os"
+	"sort"
 )
 
+func unique(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 func main() {
+	var usedOpcodes []string
 	mem := new(memory.Memory)
 	mem.LoadRom(machine.RomFilename)
 
@@ -21,6 +36,8 @@ func main() {
 
 	for idx := uint16(0); idx < memory.ROM_SIZE; idx += 0 {
 		opcode := mem.Read(idx)
+		usedOpcodes = append(usedOpcodes, i8080.DisassembleTable[opcode])
+
 		line := fmt.Sprintf("%04x\t%02x\t%s", idx, opcode, i8080.DisassembleTable[opcode])
 
 		if instructions.OpcodesLength[opcode] == 2 {
@@ -31,5 +48,11 @@ func main() {
 
 		_, _ = disassemblyFile.WriteString(fmt.Sprintf("%s\n", line))
 		idx += uint16(instructions.OpcodesLength[opcode])
+	}
+	uniqueCodes := unique(usedOpcodes)
+	sort.Strings(uniqueCodes)
+
+	for _, entry := range uniqueCodes {
+		fmt.Println(entry)
 	}
 }

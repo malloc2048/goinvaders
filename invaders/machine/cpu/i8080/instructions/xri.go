@@ -6,7 +6,7 @@ import (
 )
 
 func XRI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	registers.A = registers.A ^ memory.Read(registers.PC)
+	registers.A ^= memory.Read(registers.PC)
 
 	flags.Carry = false
 	flags.HalfCarry = false

@@ -5,8 +5,9 @@ import (
 	"goinvaders/invaders/machine/memory"
 )
 
+// R <- byte 2 (PC)
 func MVI(opcode byte, memory *memory.Memory, registers *registers.Registers) {
-	register := (opcode & 0x38) >> 4
+	register := (opcode & 0x38) >> 3
 
 	switch register {
 	case B:
@@ -22,8 +23,7 @@ func MVI(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	case L:
 		registers.L = memory.Read(registers.PC)
 	case M:
-		address := uint16(registers.H)<<8 | (uint16(registers.L))
-		memory.Write(address, memory.Read(registers.PC))
+		memory.Write(RegisterPairValue(HL, registers), memory.Read(registers.PC))
 	case A:
 		registers.A = memory.Read(registers.PC)
 	}

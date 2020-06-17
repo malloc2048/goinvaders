@@ -62,17 +62,59 @@ func (invaders *Invaders) PollEvents() {
 	}
 }
 
-func (invaders *Invaders) handleKeyUp(event *sdl.KeyboardEvent) {
-	switch event.Keysym.Scancode {
-	case sdl.SCANCODE_ESCAPE:
-		invaders.quit = true
-	}
-}
-
 func (invaders *Invaders) handleKeyDown(event *sdl.KeyboardEvent) {
 	switch event.Keysym.Scancode {
 	case sdl.SCANCODE_ESCAPE:
 		invaders.quit = true
+	case sdl.SCANCODE_T:
+		invaders.cabinet.Port2 |= 0x04
+	case sdl.SCANCODE_C:
+		invaders.cabinet.Port1 |= 0x01
+	case sdl.SCANCODE_A:
+		fallthrough
+	case sdl.SCANCODE_LEFT:
+		invaders.cabinet.Port1 |= 0x20
+	case sdl.SCANCODE_D:
+		fallthrough
+	case sdl.SCANCODE_RIGHT:
+		invaders.cabinet.Port1 |= 0x40
+	case sdl.SCANCODE_W:
+		fallthrough
+	case sdl.SCANCODE_UP:
+		fallthrough
+	case sdl.SCANCODE_SPACE:
+		invaders.cabinet.Port1 |= 0x10
+	case sdl.SCANCODE_S:
+		fallthrough
+	case sdl.SCANCODE_DOWN:
+		fallthrough
+	case sdl.SCANCODE_RETURN:
+		invaders.cabinet.Port1 |= 0x04
+	}
+}
+
+func (invaders *Invaders) handleKeyUp(event *sdl.KeyboardEvent) {
+	switch event.Keysym.Scancode {
+	case sdl.SCANCODE_ESCAPE:
+		invaders.quit = true
+	case sdl.SCANCODE_T:
+		invaders.cabinet.Port2 &= 0xfb
+	case sdl.SCANCODE_C:
+		invaders.cabinet.Port1 &= 0xfe
+	case sdl.SCANCODE_A:
+		fallthrough
+	case sdl.SCANCODE_LEFT:
+		invaders.cabinet.Port1 &= 0xdf
+	case sdl.SCANCODE_D:
+		fallthrough
+	case sdl.SCANCODE_RIGHT:
+		invaders.cabinet.Port1 &= 0xbf
+	case sdl.SCANCODE_W:
+		fallthrough
+	case sdl.SCANCODE_SPACE:
+		invaders.cabinet.Port1 &= 0xef
+	case sdl.SCANCODE_RETURN:
+		invaders.cabinet.Port1 &= 0xfb
 	}
 }
 
@@ -84,10 +126,6 @@ func (invaders *Invaders) Update() {
 	cycleCount := uint32(0)
 	for cycleCount <= machine.CyclesPerFrame {
 		startCycle := invaders.cabinet.CPU.CycleCount
-
-		// grab the next opcode for later to handle space invader special codes
-		// if hte opcode is one of the special codes the cpu will treat as a NOP
-		//opcode := invaders.cabinet.Memory.Read(invaders.cabinet.CPU.Regs.PC)
 
 		opcode := invaders.cabinet.CPU.Step()
 		cycleCount += invaders.cabinet.CPU.CycleCount - startCycle
@@ -113,11 +151,6 @@ func (invaders *Invaders) Update() {
 }
 
 func (invaders *Invaders) GpuUpdate() {
-	// one byte of VRAM contains data for 8 pixels
-	//for i := uint16(0); i < machine.ScreenWidth*machine.ScreenHeight/8; i++ {
-	//	log.Printf("VRAM memory %02x", invaders.cabinet.Memory.Read(machine.VramAddress + i))
-	//}
-
 	for i := uint16(0); i < machine.ScreenWidth*machine.ScreenHeight/8; i++ {
 		y := i * 8 / machine.ScreenHeight
 		baseX := (i * 8) % machine.ScreenHeight
@@ -189,7 +222,7 @@ func (invaders *Invaders) handleOut() {
 		invaders.cabinet.ShiftOffset = invaders.cabinet.CPU.Regs.A & 0x07
 	} else if port == 0x04 {
 		invaders.cabinet.Shift0 = invaders.cabinet.Shift1
-		invaders.cabinet.Shift0 = invaders.cabinet.CPU.Regs.A
+		invaders.cabinet.Shift1 = invaders.cabinet.CPU.Regs.A
 	}
 }
 

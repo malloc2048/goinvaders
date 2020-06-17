@@ -6,13 +6,14 @@ import (
 )
 
 func XTHL(opcode byte, memory *memory.Memory, registers *registers.Registers) {
-	sp := memory.ReadWord(registers.SP)
+	l := memory.Read(registers.SP)
+	h := memory.Read(registers.SP + 1)
 
 	memory.Write(registers.SP, registers.L)
 	memory.Write(registers.SP+1, registers.H)
 
-	registers.H = uint8(sp >> 8)
-	registers.L = uint8(sp & 0xff)
+	registers.H = h
+	registers.L = l
 
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

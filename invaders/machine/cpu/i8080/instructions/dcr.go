@@ -5,8 +5,9 @@ import (
 	"goinvaders/invaders/machine/memory"
 )
 
+// R <- R - 1
 func DCR(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	register := (opcode & 0x38) >> 4
+	register := (opcode & 0x38) >> 3
 	var value uint8
 
 	switch register {
@@ -29,9 +30,9 @@ func DCR(opcode byte, memory *memory.Memory, registers *registers.Registers, fla
 		registers.L -= 1
 		value = registers.L
 	case M:
-		address := uint16(registers.H)<<8 | (uint16(registers.L))
+		address := RegisterPairValue(HL, registers)
 		value = memory.Read(address) - 1
-		memory.Write(address, memory.Read(address)-1)
+		memory.Write(address, value)
 	case A:
 		registers.A -= 1
 		value = registers.A
@@ -39,5 +40,7 @@ func DCR(opcode byte, memory *memory.Memory, registers *registers.Registers, fla
 	flags.Sign = value > 0x7f
 	flags.Zero = value == 0x00
 	flags.Parity = CalculateParity(value)
+	flags.HalfCarry = (value & 0x0f) == 0x0f
+
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

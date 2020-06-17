@@ -7,10 +7,8 @@ import (
 
 func LHLD(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	address := memory.ReadWord(registers.PC)
-	value := memory.ReadWord(address)
-
-	registers.H = uint8(value >> 8)
-	registers.L = uint8(value & 0xff)
+	registers.H = memory.Read(address + 1)
+	registers.L = memory.Read(address)
 
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

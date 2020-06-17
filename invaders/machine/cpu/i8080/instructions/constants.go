@@ -1,6 +1,8 @@
 package instructions
 
-import "goinvaders/invaders/machine/cpu/i8080/registers"
+import (
+	"goinvaders/invaders/machine/cpu/i8080/registers"
+)
 
 const (
 	BC = 0x00
@@ -68,6 +70,7 @@ func RegisterPairValue(src uint8, registers *registers.Registers) uint16 {
 	case DE:
 		return uint16(registers.D)<<8 | uint16(registers.E)
 	case HL:
+		//log.Printf("%04x\n", uint16(registers.H)<<8 | uint16(registers.L))
 		return uint16(registers.H)<<8 | uint16(registers.L)
 	default:
 		return 0

@@ -5,6 +5,7 @@ import (
 	"goinvaders/invaders/machine/memory"
 )
 
+// RP_HIGH <- byte 3 (PC + 1), RP_LOW <- byte 2 (PC)
 func LXI(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	registerPair := (opcode & 0x30) >> 4
 	switch registerPair {
@@ -19,7 +20,6 @@ func LXI(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 		registers.H = memory.Read(registers.PC + 1)
 	case SP:
 		registers.SP = memory.ReadWord(registers.PC)
-		//registers.SP = uint16(memory.Read(registers.PC)) << 8 | uint16(memory.Read(registers.PC + 1))
 	}
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

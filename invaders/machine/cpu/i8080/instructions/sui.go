@@ -6,7 +6,7 @@ import (
 )
 
 func SUI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	diff := uint16(registers.A) - uint16(memory.Read(RegisterPairValue(HL, registers)))
+	diff := uint16(registers.A) - uint16(memory.Read(registers.PC))
 
 	flags.Sign = diff > 0x7f
 	flags.Zero = diff == 0x00

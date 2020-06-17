@@ -6,7 +6,6 @@ import (
 )
 
 func STA(opcode byte, memory *memory.Memory, registers *registers.Registers) {
-	address := memory.ReadWord(registers.PC)
-	memory.Write(address, registers.A)
+	memory.Write(memory.ReadWord(registers.PC), registers.A)
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

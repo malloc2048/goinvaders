@@ -5,15 +5,14 @@ import (
 	"goinvaders/invaders/machine/memory"
 )
 
+// (RP) <- A
 func STAX(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	rp := (opcode & 0x03) >> 4
 	switch rp {
 	case BC:
-		address := uint16(registers.B)<<8 | uint16(registers.C)
-		memory.Write(address, registers.A)
+		memory.Write(RegisterPairValue(BC, registers), registers.A)
 	case DE:
-		address := uint16(registers.D)<<8 | uint16(registers.E)
-		memory.Write(address, registers.A)
+		memory.Write(RegisterPairValue(DE, registers), registers.A)
 	}
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

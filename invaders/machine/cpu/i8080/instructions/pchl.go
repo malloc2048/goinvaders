@@ -5,5 +5,5 @@ import (
 )
 
 func PCHL(registers *registers.Registers) {
-	registers.PC = uint16(registers.H)<<8 | uint16(registers.L)
+	registers.PC = RegisterPairValue(HL, registers)
 }

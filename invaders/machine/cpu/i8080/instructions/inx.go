@@ -4,6 +4,7 @@ import (
 	"goinvaders/invaders/machine/cpu/i8080/registers"
 )
 
+// RP <- RP + 1
 func INX(opcode byte, registers *registers.Registers) {
 	registerPair := (opcode & 0x30) >> 4
 	switch registerPair {

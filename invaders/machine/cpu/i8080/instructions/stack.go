@@ -12,17 +12,21 @@ func POP(opcode byte, memory *memory.Memory, registers *registers.Registers, fla
 	case BC:
 		registers.C = memory.Read(registers.SP)
 		registers.B = memory.Read(registers.SP + 1)
+		registers.SP += 2
 	case DE:
 		registers.E = memory.Read(registers.SP)
 		registers.D = memory.Read(registers.SP + 1)
+		registers.SP += 2
 	case HL:
 		registers.L = memory.Read(registers.SP)
 		registers.H = memory.Read(registers.SP + 1)
+		registers.SP += 2
 	case SP:
 		restorePSW(memory.Read(registers.SP), flags)
 		registers.A = memory.Read(registers.SP + 1)
+		registers.SP += 2
 	}
-	registers.SP += 2
+
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }
 
@@ -41,22 +45,26 @@ func PUSH(opcode byte, memory *memory.Memory, registers *registers.Registers, fl
 	case BC:
 		memory.Write(registers.SP-1, registers.B)
 		memory.Write(registers.SP-2, registers.C)
+		registers.SP -= 2
 	case DE:
 		memory.Write(registers.SP-1, registers.D)
 		memory.Write(registers.SP-2, registers.E)
+		registers.SP -= 2
 	case HL:
 		memory.Write(registers.SP-1, registers.H)
 		memory.Write(registers.SP-2, registers.L)
+		registers.SP -= 2
 	case SP:
 		memory.Write(registers.SP-1, registers.A)
 		memory.Write(registers.SP-2, makePSW(flags))
+		registers.SP -= 2
 	}
-	registers.SP -= 2
+
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }
 
 func makePSW(flags *registers.Flags) uint8 {
-	psw := uint8(0)
+	psw := uint8(0x00)
 
 	if flags.Zero {
 		psw |= 0x01

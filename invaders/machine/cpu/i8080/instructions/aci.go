@@ -6,7 +6,7 @@ import (
 )
 
 func ACI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	sum := uint16(registers.A) + uint16(memory.Read(RegisterPairValue(HL, registers)))
+	sum := uint16(registers.A) + uint16(memory.Read(registers.PC))
 
 	if flags.Carry {
 		sum += 1

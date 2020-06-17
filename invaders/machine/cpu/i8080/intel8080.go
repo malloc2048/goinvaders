@@ -1,10 +1,12 @@
 package i8080
 
 import (
+	"fmt"
 	"goinvaders/invaders/machine/cpu/i8080/instructions"
 	"goinvaders/invaders/machine/cpu/i8080/registers"
 	"goinvaders/invaders/machine/memory"
 	"log"
+	"strings"
 )
 
 func NewCPU(memory *memory.Memory) *Intel8080 {
@@ -61,81 +63,36 @@ func (cpu *Intel8080) NextByte() byte {
 }
 
 func (cpu *Intel8080) debug() {
+	var msg strings.Builder
+	msg.WriteString(fmt.Sprintf("%04x ", cpu.Regs.PC))
+
 	switch cpu.Regs.PC {
 	case 0x00:
-		log.Printf("%04x reset\n", cpu.Regs.PC)
-	//case 0x01ef:
-	//	log.Printf("%04x DrawShieldPl1\n", cpu.Regs.PC)
-	//case 0x021A:
-	//	log.Printf("%04x RestoreShields1\n", cpu.Regs.PC)
-	//case 0x021e:
-	//	log.Printf("%04x CopyShields\n", cpu.Regs.PC)
-	//case 0x01cf:
-	//	log.Printf("%04x DrawBottomLine\n", cpu.Regs.PC)
-	//case 0x14D7:
-	//	log.Printf("%04x Return from ClearSmallSprite\n", cpu.Regs.PC)
-	//case 0x01d9:
-	//	log.Printf("%04x AddDelta\n", cpu.Regs.PC)
-	//case 0x01e4:
-	//	log.Printf("%04x CopyRAMMirror\n", cpu.Regs.PC)
-	//case 0x002d:
-	//	log.Printf("%04x Handle bumping credit count\n", cpu.Regs.PC)
-	//case 0x005d:
-	//	log.Printf("%04x no game is going and there are credits\n", cpu.Regs.PC)
-	//case 0x0067:
-	//	log.Printf("%04x Mark credit as needing registering\n", cpu.Regs.PC)
-	//case 0x006f:
-	//	log.Printf("%04x Main game-play timing loop\n", cpu.Regs.PC)
-	//case 0x00b1:
-	//	log.Printf("%04x InitRack\n", cpu.Regs.PC)
-	//case 0x0100:
-	//	log.Printf("%04x DrawAlien\n", cpu.Regs.PC)
-	//case 0x0141:
-	//	log.Printf("%04x CursorNextAlien\n", cpu.Regs.PC)
-	//case 0x017a:
-	//	log.Printf("%04x GetAlienCoords\n", cpu.Regs.PC)
-	//case 0x01a1:
-	//	log.Printf("%04x MoveRefAlien\n", cpu.Regs.PC)
-	//case 0x01c0:
-	//	log.Printf("%04x InitAliens\n", cpu.Regs.PC)
-	//case 0x14cb:
-	//	log.Printf("%04x ClearSmallSprite\n", cpu.Regs.PC)
-	//case 0x0248:
-	//	log.Printf("%04x RunGameObjs\n", cpu.Regs.PC)
-	//case 0x024b:
-	//	log.Printf("%04x RunGameObjs skipping first instruction\n", cpu.Regs.PC)
-	//case 0x0b4a:
-	//	log.Printf("%04x Play demo\n", cpu.Regs.PC)
-	//case 0x08d1:
-	//	log.Printf("%04x GetShipsPerCred\n", cpu.Regs.PC)
-	//case 0x09d6:
-	//	log.Printf("%04x ClearPlayField\n", cpu.Regs.PC)
-	//case 0x1a7f:
-	//	log.Printf("%04x RemoveShip\n", cpu.Regs.PC)
-	//case 0x1618:
-	//	log.Printf("%04x PlrFireOrDemo\n", cpu.Regs.PC)
-	//case 0x092e:
-	//	log.Printf("%04x Get number of ships for active player\n", cpu.Regs.PC)
-	//case 0x1611:
-	//	log.Printf("%04x GetPlayerDataPtr\n", cpu.Regs.PC)
-	//case 0x19e6:
-	//	log.Printf("%04x DrawNumShips\n", cpu.Regs.PC)
-	//case 0x01f8:
-	//	log.Printf("%04x Going to draw 4 shields\n", cpu.Regs.PC)
-	//case 0x0205:
-	//	log.Printf("%04x Drawing shields RESETTING here somwhere\n", cpu.Regs.PC)
+		msg.WriteString("reset")
+	//case 0x1439:
+	//	log.Printf("DrawSimpSprite")
+	//case 0x0935:
+	//	log.Printf("Award extra ship")
+	//case 0x08ff:
+	//	log.Printf("DrawChar")
+	//case 0x073F:
+	//	log.Printf("Draw the flying saucer")
+	//case 0x036F:
+	//	log.Printf("Draw player sprite")
+	//case 0x19E6:
+	//	log.Printf("DrawNumShips")
+	//case 0x1844:
+	//	log.Printf("DrawAdvTable")
 	default:
 	}
+	log.Printf("%s\n", msg.String())
 }
 
 func (cpu *Intel8080) Step() byte {
-	cpu.debug()
-
 	opcode := cpu.NextByte()
 	cpu.CycleCount += uint32(OpcodesCycles[opcode])
 
 	switch opcode {
-	case 0x00:
 	case 0x01:
 		instructions.LXI(opcode, cpu.memory, &cpu.Regs)
 	case 0x02:
@@ -152,7 +109,6 @@ func (cpu *Intel8080) Step() byte {
 		instructions.Rotate(opcode, &cpu.Regs, &cpu.flags)
 	case 0x09:
 		instructions.DAD(opcode, &cpu.Regs, &cpu.flags)
-	case 0x08:
 	case 0x0a:
 		instructions.LDAX(opcode, cpu.memory, &cpu.Regs)
 	case 0x0b:
@@ -365,6 +321,7 @@ func (cpu *Intel8080) Step() byte {
 	case 0x75:
 		instructions.MOV(opcode, cpu.memory, &cpu.Regs)
 	case 0x76: // HLT
+		instructions.NOP(opcode, &cpu.Regs, DisassembleTable[opcode])
 	case 0x77:
 		instructions.MOV(opcode, cpu.memory, &cpu.Regs)
 	case 0x78:
@@ -553,6 +510,8 @@ func (cpu *Intel8080) Step() byte {
 		instructions.POP(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
 	case 0xd2:
 		instructions.Jump(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
+	case 0xd3:
+		// OUT
 	case 0xd4:
 		instructions.Call(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
 	case 0xd5:
@@ -565,6 +524,8 @@ func (cpu *Intel8080) Step() byte {
 		instructions.Return(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
 	case 0xda:
 		instructions.Jump(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
+	case 0xdb:
+		// IN
 	case 0xdc:
 		instructions.Call(opcode, cpu.memory, &cpu.Regs, &cpu.flags)
 	case 0xde:
@@ -635,7 +596,7 @@ func (cpu *Intel8080) Step() byte {
 		instructions.RST(opcode, cpu.memory, &cpu.Regs)
 
 	default:
-		// NOP / Unimplemented
+		instructions.NOP(opcode, &cpu.Regs, DisassembleTable[opcode])
 	}
 	return opcode
 }

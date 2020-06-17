@@ -8,7 +8,7 @@ import (
 func Call(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
 	var takeJump = true
 
-	if opcode&0x07 == 2 {
+	if opcode&0x07 == 4 {
 		condition := opcode & 0x38 >> 3
 		switch condition {
 		case NotZero:

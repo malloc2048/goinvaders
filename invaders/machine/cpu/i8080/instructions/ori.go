@@ -7,6 +7,7 @@ import (
 
 func ORI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
 	registers.A |= memory.Read(registers.PC)
+
 	flags.Carry = false
 	flags.HalfCarry = false
 	flags.Sign = registers.A > 0x7f

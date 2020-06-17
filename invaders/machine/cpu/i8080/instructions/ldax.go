@@ -7,14 +7,12 @@ import (
 
 func LDAX(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	registerPair := (opcode & 0x30) >> 4
-	var address uint16
 
 	switch registerPair {
 	case BC:
-		address = uint16(registers.B)<<8 | uint16(registers.C)
+		registers.A = memory.Read(RegisterPairValue(BC, registers))
 	case DE:
-		address = uint16(registers.D)<<8 | uint16(registers.E)
+		registers.A = memory.Read(RegisterPairValue(DE, registers))
 	}
-	registers.A = memory.Read(address)
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

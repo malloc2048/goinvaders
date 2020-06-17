@@ -5,8 +5,9 @@ import (
 	"goinvaders/invaders/machine/memory"
 )
 
+// R <- R + 1
 func INR(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	register := (opcode & 0x38) >> 4
+	register := (opcode & 0x38) >> 3
 	var value uint8
 
 	switch register {

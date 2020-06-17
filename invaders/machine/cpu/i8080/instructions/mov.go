@@ -23,10 +23,9 @@ func MOV(opcode byte, memory *memory.Memory, registers *registers.Registers) {
 	case L:
 		move(dst, registers.L, memory, registers)
 	case M:
-		address := uint16(registers.H)<<8 | (uint16(registers.L))
-		move(dst, memory.Read(address), memory, registers)
+		move(dst, memory.Read(RegisterPairValue(HL, registers)), memory, registers)
 	case A:
-		move(dst, registers.B, memory, registers)
+		move(dst, registers.A, memory, registers)
 	}
 
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
@@ -47,8 +46,7 @@ func move(dst uint8, value uint8, memory *memory.Memory, registers *registers.Re
 	case L:
 		registers.L = value
 	case M:
-		address := uint16(registers.H)<<8 | (uint16(registers.L))
-		memory.Write(address, value)
+		memory.Write(RegisterPairValue(HL, registers), value)
 	case A:
 		registers.A = value
 	}

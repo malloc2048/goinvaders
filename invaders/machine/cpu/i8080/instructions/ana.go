@@ -31,7 +31,7 @@ func ANA(opcode byte, memory *memory.Memory, registers *registers.Registers, fla
 	flags.Sign = result > 0x7f
 	flags.Zero = result == 0x00
 	flags.Parity = CalculateParity(result)
-	flags.HalfCarry = (registers.A | result) != 0
+	flags.HalfCarry = (registers.A|result)&0x08 != 0
 
 	registers.A = result
 	registers.PC += uint16(OpcodesLength[opcode] - 1)

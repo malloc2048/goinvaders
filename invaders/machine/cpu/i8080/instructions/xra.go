@@ -6,34 +6,32 @@ import (
 )
 
 func XRA(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	var result uint8
 	src := opcode & 0x07
 
 	switch src {
 	case B:
-		result = registers.B ^ registers.A
+		registers.A ^= registers.B
 	case C:
-		result = registers.C ^ registers.A
+		registers.A ^= registers.C
 	case D:
-		result = registers.D ^ registers.A
+		registers.A ^= registers.D
 	case E:
-		result = registers.E ^ registers.A
+		registers.A ^= registers.E
 	case H:
-		result = registers.H ^ registers.A
+		registers.A ^= registers.H
 	case L:
-		result = registers.L ^ registers.A
+		registers.A ^= registers.L
 	case A:
-		result = registers.A ^ registers.A
+		registers.A ^= registers.A
 	case M:
-		result = registers.A ^ memory.Read(RegisterPairValue(HL, registers))
+		registers.A ^= memory.Read(RegisterPairValue(HL, registers))
 	}
 
 	flags.Carry = false
 	flags.HalfCarry = false
-	flags.Sign = result > 0x7f
-	flags.Zero = result == 0x00
-	flags.Parity = CalculateParity(result)
+	flags.Sign = registers.A > 0x7f
+	flags.Zero = registers.A == 0x00
+	flags.Parity = CalculateParity(registers.A)
 
-	registers.A = result
 	registers.PC += uint16(OpcodesLength[opcode] - 1)
 }

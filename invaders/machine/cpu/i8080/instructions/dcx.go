@@ -9,17 +9,20 @@ func DCX(opcode byte, registers *registers.Registers) {
 
 	switch registerPair {
 	case BC:
-		value := (uint16(registers.B)<<8 | uint16(registers.C)) - 1
-		registers.B = uint8(value >> 8)
-		registers.C = uint8(value & 0xff)
+		if registers.C == 0x00 {
+			registers.B -= 1
+		}
+		registers.C -= 1
 	case DE:
-		value := (uint16(registers.D)<<8 | uint16(registers.E)) - 1
-		registers.D = uint8(value >> 8)
-		registers.E = uint8(value & 0xff)
+		if registers.E == 0x00 {
+			registers.D -= 1
+		}
+		registers.E -= 1
 	case HL:
-		value := (uint16(registers.H)<<8 | uint16(registers.L)) - 1
-		registers.H = uint8(value >> 8)
-		registers.L = uint8(value & 0xff)
+		if registers.L == 0x00 {
+			registers.H -= 1
+		}
+		registers.L -= 1
 	case SP:
 		registers.SP -= 1
 	}

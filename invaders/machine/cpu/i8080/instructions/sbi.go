@@ -6,7 +6,7 @@ import (
 )
 
 func SBI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	diff := uint16(registers.A) - uint16(memory.Read(RegisterPairValue(HL, registers)))
+	diff := uint16(registers.A) - uint16(memory.Read(registers.PC))
 	if flags.Carry {
 		diff -= 1
 	}

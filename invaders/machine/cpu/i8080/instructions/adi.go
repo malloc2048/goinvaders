@@ -6,7 +6,7 @@ import (
 )
 
 func ADI(opcode byte, memory *memory.Memory, registers *registers.Registers, flags *registers.Flags) {
-	sum := uint16(registers.A) + uint16(memory.Read(RegisterPairValue(HL, registers)))
+	sum := uint16(registers.A) + uint16(memory.Read(registers.PC))
 
 	flags.Sign = sum > 0x7f
 	flags.Zero = sum == 0x00

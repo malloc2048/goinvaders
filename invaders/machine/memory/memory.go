@@ -26,7 +26,11 @@ func (mem *Memory) Read(address uint16) byte {
 }
 
 func (mem *Memory) ReadWord(address uint16) uint16 {
-	return uint16(mem.Storage[address]) | uint16(mem.Storage[address+1])<<8
+	var value uint16
+	value = uint16(mem.Storage[address])
+	value |= uint16(mem.Storage[address+1]) << 8
+
+	return value
 }
 
 func (mem *Memory) Write(address uint16, value byte) {
